@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
-//import 'package:just_audio/just_audio.dart';
+import 'package:just_audio/just_audio.dart';
 
 void main() {
   runApp(const MyApp());
@@ -59,30 +59,53 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 30;
-  int _counter_sec = 10;
-  int _counter_min = 2;
+  int _counter_sec = 11;
+  int _counter_min = 0;
   //int initial = 20;
   bool isStarted = false;
   late Timer timer;
- // final player = AudioPlayer();
+  final player = AudioPlayer();
+
+
+  void playAudio()
+  {
+
+    player.play();
+  }
+
+  void stopAudio()
+  {
+    player.stop();
+  }
 
   @override
   void initState()
   {
+
+    player.setAsset('assets/HeatleyBros.mp3');
     Timer.periodic(const Duration(seconds: 1),(timer)
     {
       // if(timer.isActive)
       //   ElevatedButton(onPressed: reset, child: Text('Reset'),)
 
-      setState(() {
+      setState(()  {
 
         if(isStarted == false) {
+
           timer.cancel();
         }
         else{
           if(_counter_sec>0) {
             _counter_sec--;
           }
+
+          else if(_counter_min == 0 && _counter_sec == 0){
+            timer.cancel();
+
+            playAudio();
+            isStarted = false;
+          }
+
           else if(_counter_sec<=0)
             {
               _counter_sec = 59;
@@ -92,11 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // if(_counter >0) {
           //   _counter--;
           // }
-          else if(_counter_min == 0 && _counter_sec == 0){
-            timer.cancel();
 
-            isStarted = false;
-          }
         }
 
       });
@@ -116,6 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //_counter = 30;
       _counter_min = 2;
       _counter_sec = 10;
+      stopAudio();
     });
   }
 
@@ -153,11 +173,6 @@ void start()
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
 
       _counter++;
     });
