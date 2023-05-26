@@ -59,8 +59,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 30;
-  int _counter_sec = 11;
-  int _counter_min = 0;
+
+  int init_sec = 5;
+  int init_min = 1;
+  int init_hour = 0;
+  int _counter_sec = 5;
+  int _counter_min = 1;
+  int _counter_hour = 0;
   //int initial = 20;
   bool isStarted = false;
   late Timer timer;
@@ -99,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _counter_sec--;
           }
 
-          else if(_counter_min == 0 && _counter_sec == 0){
+          else if(_counter_hour == 0 && _counter_min == 0 && _counter_sec == 0){
             timer.cancel();
 
             playAudio();
@@ -110,6 +115,12 @@ class _MyHomePageState extends State<MyHomePage> {
             {
               _counter_sec = 59;
               _counter_min--;
+              if(_counter_min<=0 && _counter_hour !=0) {
+
+                  _counter_hour --;
+
+                _counter_min = 59;
+              }
             }
 
           // if(_counter >0) {
@@ -127,14 +138,14 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-@override
-  void reset()
+void reset()
   {
     setState(() {
       isStarted = false;
       //_counter = 30;
-      _counter_min = 2;
-      _counter_sec = 10;
+      _counter_hour = init_hour;
+      _counter_min = init_min;
+      _counter_sec = init_sec;
       stopAudio();
     });
   }
@@ -150,7 +161,6 @@ class _MyHomePageState extends State<MyHomePage> {
 //   }
 //
 
-  @override
   void pause()
   {
     int a = _counter_sec;
@@ -162,7 +172,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _counter_min = b;
   }
 
-@override
 void start()
 {
   setState(() {
@@ -178,6 +187,16 @@ void start()
     });
   }
 
+  double remainingDuration()
+  {
+    int totalInit = init_hour*3600 + init_min*60 + init_sec;
+    int totalR = _counter_hour*3600 + _counter_min*60 + _counter_sec;
+
+    double remaining =  1/totalInit * totalR;
+    print(remaining);
+    return remaining;
+
+  }
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -199,29 +218,97 @@ void start()
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(vertical: 200),
-          child: Column(
-            children: [
-              Text(
-               // _counter.toString(),
-                _counter_min.toString()+ ':' + _counter_sec.toString(),
-    style: GoogleFonts.lato(fontSize: 50),
-    //'00:00:00',
-    ),
-              ElevatedButton(onPressed: reset,child: const Text('Reset')),
-              if(isStarted == true)
-              ElevatedButton(onPressed:pause, child: const Text('Pause')),
-              if(isStarted == false)
-              ElevatedButton(onPressed: start, child: const Text('Start')),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+              //  Container(
+            //
+               //   padding: EdgeInsets.symmetric(vertical: 200),
 
-            ],
-          ),
+                  //  children: [
+
+    //'00:00:00',
+                SizedBox(
+                        height: 300,
+                        width: 300,
+                        child: CircularProgressIndicator(
+                          value: remainingDuration(),
+                          strokeWidth: 15,
+                        )
+  ),
+                          Text(
+                            // _counter.toString(),
+                            _counter_hour.toString().padLeft(2, '0')+":"+_counter_min.toString().padLeft(2, '0')+ ':' + _counter_sec.toString().padLeft(2, '0'),
+                            style: GoogleFonts.lato(fontSize: 50),
+
+                      ),
+
+              ],
+            ),
+
+            const Padding(
+                padding: EdgeInsets.all(15)),
+
+            Column(
+              children: <Widget>[
+
+                Row(
+
+                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // ElevatedButton(onPressed: reset,child: const Text('Reset')),
+                    //
+                    // if(isStarted == true)
+                    //   ElevatedButton(onPressed:pause, child: const Text('Pause')),
+                    // if(isStarted == false)
+                    //   ElevatedButton(onPressed: start, child: const Text('Start')),
+
+                    const Spacer(flex: 1),
+
+                    IconButton(onPressed: reset, icon: const Icon(Icons.restart_alt),iconSize: 35.0,color: Colors.deepPurple),
+
+                    const Spacer(),
+                   if(isStarted == true)
+
+                        IconButton(onPressed: pause, icon: const Icon(Icons.pause),iconSize: 50.0,color: Colors.deepPurple),
+
+                    if(isStarted == false)
+
+                        IconButton(onPressed: start, icon: const Icon(Icons.play_arrow),iconSize: 60.0,color: Colors.deepPurple),
+                    const Spacer(flex: 3),
+
+
+
+
+
+                    
+                    
+                  ],
+                ),
+
+              ],
+            ),
+
+          ],
         ) ,
 
 
-      ),// This trailing comma makes auto-formatting nicer for build methods.
+
+
+             //   ],
+
+          //  ),
+
+
+
+      ),
+
+
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
